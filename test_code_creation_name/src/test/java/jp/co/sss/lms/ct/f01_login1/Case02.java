@@ -38,47 +38,49 @@ public class Case02 {
 	@Order(1)
 	@DisplayName("テスト01 トップページURLでアクセス")
 	void test01() {
+		//URLにアクセス
+		goTo("http://localhost:8080/lms");
 
-		// トップページへアクセス
-		goTo("http://localhost:8080/lms/");
+		// ログイン画面のタイトルを確認
+		assertEquals("ログイン | LMS", webDriver.getTitle());
 
-		// ログイン画面が表示されていることを確認
-		WebElement title = webDriver.findElement(By.tagName("h2"));
-		assertEquals("ログイン", title.getText());
+		// ログインID欄が空欄であることを確認
+		WebElement loginId = webDriver.findElement(By.id("loginId"));
+		assertEquals("", loginId.getAttribute("value"));
+
+		// パスワード欄が空欄であることを確認
+		WebElement password = webDriver.findElement(By.id("password"));
+		assertEquals("", password.getAttribute("value"));
+
+		// エビデンス取得
+		getEvidence(new Object() {
+		});
 	}
 
 	@Test
 	@Order(2)
 	@DisplayName("テスト02 DBに登録されていないユーザーでログイン")
 	void test02() {
+		// ユーザーID入力
+		webDriver.findElement(By.id("loginId")).sendKeys("testLogin");
 
-		// DBに登録されていないログインIDを入力
-		WebElement loginId = webDriver.findElement(By.id("loginId"));
-		loginId.sendKeys("not_registered_user");
-
-		// パスワードを入力
-		WebElement password = webDriver.findElement(By.id("password"));
-		password.sendKeys("invalid_password");
+		// パスワード入力
+		webDriver.findElement(By.id("password")).sendKeys("testPassword");
 
 		// ログインボタンを押下
-		webDriver.findElement(
-				By.cssSelector("input[type='submit'][value='ログイン']")).click();
+		webDriver.findElement(By.className("btn-primary")).click();
 
-		// 認証失敗メッセージが表示されるまで待機
-		By errorLocator = By.cssSelector("form.form-horizontal > span.help-inline.error");
-		visibilityTimeout(errorLocator, 5);
+		// ログイン失敗後、ログイン画面に戻ることを確認
+		assertEquals("http://localhost:8080/lms/", webDriver.getCurrentUrl());
 
-		// 認証失敗メッセージを確認
-		WebElement errorMessage = webDriver.findElement(errorLocator);
-		assertTrue(errorMessage.getText().contains("ログインに失敗しました。"));
+		// ログイン失敗メッセージを確認
+		WebElement errorMessage = webDriver.findElement(By.cssSelector("span.help-inline.error"));
 
-		// ログイン画面に留まっていることを確認
-		WebElement title = webDriver.findElement(By.tagName("h2"));
-		assertEquals("ログイン", title.getText());
+		assertEquals("* ログインに失敗しました。", errorMessage.getText());
 
 		// エビデンス取得
 		getEvidence(new Object() {
 		});
-
 	}
+
 }
