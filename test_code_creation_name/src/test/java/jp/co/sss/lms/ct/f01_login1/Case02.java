@@ -71,7 +71,7 @@ public class Case02 {
 		webDriver.findElement(By.className("btn-primary")).click();
 
 		// ログイン失敗後、ログイン画面に戻ることを確認
-		assertEquals("http://localhost:8080/lms/", webDriver.getCurrentUrl());
+		assertEquals("http://localhost:8080/lms/login", webDriver.getCurrentUrl());
 
 		// ログイン失敗メッセージを確認
 		WebElement errorMessage = webDriver.findElement(By.cssSelector("span.help-inline.error"));
